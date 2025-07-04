@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title></title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
+  <!-- Tesseract.js -->
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@2.1.5/dist/tesseract.min.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Tajawal', sans-serif;
+      background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
+      min-height: 100vh;
+    }
+
+    h1 {
+      font-size: 36px;
+      margin-bottom: 10px;
+    }
+
+    p {
+      font-size: 18px;
+      margin-bottom: 30px;
+    }
+
+    input[type="file"] {
+      background-color: #1c1c1e;
+      color: #fff;
+      border: 2px solid #00c896;
+      padding: 10px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: all 0.3s ease;
+    }
+
+    input[type="file"]:hover {
+      background-color: #00c896;
+      color: #1c1c1e;
+    }
+
+    #result {
+      margin-top: 30px;
+      font-size: 20px;
+      color: #00ffae;
+    }
+
+    #downloadBtn {
+      display: none;
+      margin-top: 30px;
+      padding: 12px 28px;
+      font-size: 18px;
+      background: linear-gradient(135deg, #00c896, #00a1ab);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+
+    #downloadBtn:hover {
+      transform: scale(1.05);
+      background: linear-gradient(135deg, #00ffb3, #00c4d6);
+    }
+
+    .loader {
+      border: 5px solid #f3f3f3;
+      border-top: 5px solid #00ffb3;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin-top: 20px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+  </style>
+</head>
+<body>
+
+  <h1>تحميل كتاب من صفر إلى 30,000 دولار</h1>
+  <p>قم برفع صورة الإيصال أو سكرين شوت للتحقق من إتمام عملية التحويل</p>
+
+  <input type="file" id="imageInput" accept="image/*">
+  <div id="result"></div>
+  <div id="loader" class="loader" style="display:none;"></div>
+
+  <button id="downloadBtn" onclick="window.location.href='https://drive.google.com/file/d/1T0uXN3eOgdN7ZoITShIQpd60NngAwd1x/view?usp=drivesdk'">📘 تحميل الكتاب</button>
+
+  <script>
+    const imageInput = document.getElementById('imageInput');
+    const resultDiv = document.getElementById('result');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const loader = document.getElementById('loader');
+
+    // الكلمات التي تؤدي إلى ظهور زر التحميل
+    const keywords = ["249", "250", "Thanks", "٢٤٩", "٢٥٠", "01017388913"];
+
+    imageInput.addEventListener('change', () => {
+      const file = imageInput.files[0];
+      if (!file) return;
+
+      resultDiv.textContent = 'جارٍ تحليل الصورة...';
+      loader.style.display = 'block';
+      downloadBtn.style.display = 'none';
+
+      Tesseract.recognize(
+        file,
+        'eng+ara',
+        {
+          logger: m => console.log(m)
+        }
+      ).then(({ data: { text } }) => {
+        loader.style.display = 'none';
+        console.log("Extracted text:", text);
+
+        // تحقق إذا النص يحتوي أي من الكلمات المفتاحية
+        const matched = keywords.some(keyword => text.includes(keyword));
+
+        if (matched) {
+          resultDiv.textContent = '✅ تم التحويل بنجاح';
+          downloadBtn.style.display = 'inline-block';
+        } else {
+          resultDiv.textContent = '❌ لم يتم التحويل ';
+        }
+
+      }).catch(err => {
+        loader.style.display = 'none';
+        resultDiv.textContent = '❌ حدث خطأ أثناء قراءة الصورة';
+        console.error(err);
+      });
+    });
+  </script>
+
+</body>
+</html>
